@@ -1,59 +1,12 @@
-name: Trivy SCA Scan
+name: Test
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  security-events: write
-
 jobs:
-  trivy-scan:
-    name: Trivy Dependency Vulnerability Scan
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: json
-          output: trivy-results.json
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Generate CSV Report
-        run: |
-          echo "Package,CVE,Severity" > trivy-report.csv
-
-          jq -r '
-            .Results[]? |
-            .Vulnerabilities[]? |
-            [
-              .PkgName,
-              .VulnerabilityID,
-              .Severity
-            ] | @csv
-          ' trivy-results.json >> trivy-report.csv
-
-      - name: Upload JSON Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-json-report
-          path: trivy-results.json
-
-      - name: Upload CSV Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-csv-report
-          path: trivy-report.csv
-
-      - name: Display Summary
-        run: |
-          echo "Top Vulnerabilities Found:"
-          head -20 trivy-report.csv
+      - run: echo "Hello"
